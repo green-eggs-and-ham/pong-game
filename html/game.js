@@ -4,7 +4,7 @@ class paddle {
     this.y=-1;
     this.nx=-1;
     this.ny=-1;
-    this.ms=2;
+    this.ms=2; //const1
     this.check_x=false;
     this.check_y=false;
     this.side=side;
@@ -71,31 +71,31 @@ class paddle {
     } else {
       this.nx=0;
       this.ny=0;
-      if (keyIsDown(87)){
+      if (keyIsDown(87)){ //w
         this.ny=this.ny-this.ms;
         this.recharge();
       }
-      if (keyIsDown(83)){
+      if (keyIsDown(83)){ //s
         this.ny=this.ny+this.ms;
         this.recharge();
       }
-      if (keyIsDown(65)){
+      if (keyIsDown(65)){ //a
         this.nx=this.nx-this.ms;
         this.recharge();
       }
-      if (keyIsDown(68)){
+      if (keyIsDown(68)){ //d
         this.nx=this.nx+this.ms;
         this.recharge();
       }
-      if (keyIsDown(32)){
+      if (keyIsDown(32)){ //space
         if (!this.bash_tick) {
           this.bash_tick=360;
         }
       }
-      if (this.bash_tick > 345){
-        this.ms=this.ms*1.2;
+      if (this.bash_tick > 345){ //tick duration from 360
+        this.ms=this.ms*1.2; //ms increaser
       } else {
-        this.ms=2;
+        this.ms=2; //const2
       }
       this.check_coords(this.x+this.nx,this.y+this.ny);
       if (this.check_x){this.x=this.x+this.nx}
