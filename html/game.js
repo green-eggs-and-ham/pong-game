@@ -135,8 +135,8 @@ function draw() {
   tick_multi_2=abs(cos(ticker));
   background(16*tick_multi,16*tick_multi,16*tick_multi,16*tick_multi_2+64);
   stroke(128,128,128);
-  strokeWeight(2);
-  setLineDash([5,5]);
+  strokeWeight(2.5); //centerline
+  setLineDash([7,7]); //^
   line(256,0-tick_multi*8,256,256+tick_multi_2*8);
   left_paddle.render();
   right_paddle.render();
