@@ -4,7 +4,7 @@ class paddle {
     this.y=-1;
     this.nx=-1;
     this.ny=-1;
-    this.ms=2; //const1
+    this.ms=4; //const1
     this.check_x=false;
     this.check_y=false;
     this.side=side;
@@ -12,6 +12,9 @@ class paddle {
     this.min_y=14;
     this.max_y=242;
     this.bash_tick=0;
+    this.bash_start=360;
+    this.ms_tick=0;
+    this.bash_length=15;
     if (side==0) {
       this.min_x=8;
       this.max_x=248;
@@ -33,9 +36,9 @@ class paddle {
     noStroke();
     fill(192);
     if (this.side) {
-      rect(512,256,-1*(360-this.bash_tick)/360*250,16,0,5,5,0);
+      rect(512,256,-1*(this.bash_start-this.bash_tick)/this.bash_start*250,16,0,5,5,0);
     } else {
-      rect(0,256,(360-this.bash_tick)/360*250,16,0,5,5,0);
+      rect(0,256,(this.bash_start-this.bash_tick)/this.bash_start*250,16,0,5,5,0);
     }
   }
   
@@ -71,31 +74,40 @@ class paddle {
     } else {
       this.nx=0;
       this.ny=0;
+      this.recharge();
       if (keyIsDown(87)){ //w
         this.ny=this.ny-this.ms;
-        this.recharge();
+        //this.recharge();
       }
       if (keyIsDown(83)){ //s
         this.ny=this.ny+this.ms;
-        this.recharge();
+        //this.recharge();
       }
       if (keyIsDown(65)){ //a
         this.nx=this.nx-this.ms;
-        this.recharge();
+        //this.recharge();
       }
       if (keyIsDown(68)){ //d
         this.nx=this.nx+this.ms;
-        this.recharge();
+        //this.recharge();
       }
       if (keyIsDown(32)){ //space
         if (!this.bash_tick) {
-          this.bash_tick=360;
+          this.bash_tick=this.bash_start;
+          this.bash_length=15;
+        } else {
+          if (this.bash_tick < 345) {
+            this.bash_length=15-this.bash_tick/this.bash_start*15;
+            this.bash_tick=this.bash_start;
+          }
         }
       }
-      if (this.bash_tick > 300){ //tick duration from 360
-        this.ms=this.ms*0.8; //ms increaser
+      if (this.bash_tick > this.bash_start - this.bash_length){ //tick duration from 360
+        this.ms_tick=this.ms_tick+6;
+        this.ms=4+abs(sin(this.ms_tick)*10);//ms increaser
       } else {
-        this.ms=2; //const2
+        this.ms=4; //const2
+        this.ms_tick=0;
       }
       this.check_coords(this.x+this.nx,this.y+this.ny);
       if (this.check_x){this.x=this.x+this.nx}
