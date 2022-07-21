@@ -414,9 +414,11 @@ class paddle {
         if (!this.bash_tick) {
           this.bash_tick = this.bash_start;
           this.bash_length = 15;
+          this.break_cooldown = 10;
         } else {
           if (this.bash_tick < 345) {
             this.bash_length = 15 - (this.bash_tick / this.bash_start) * 15;
+            this.break_cooldown = 5;
             this.bash_tick = this.bash_start;
           }
         }
