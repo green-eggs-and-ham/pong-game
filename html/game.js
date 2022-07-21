@@ -12,7 +12,7 @@ class particle {
   // creation of a particle.
   createParticle() {
     noStroke();
-    fill("rgba(200,169,169,0.5)");
+    fill("rgba(200,169,169,0.2)");
     circle(this.x, this.y, this.r);
   }
 
@@ -87,6 +87,11 @@ class game {
         16 * tick_multi,
         16 * tick_multi_2 + 128
       );
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].createParticle();
+        particles[i].moveParticle();
+        particles[i].joinParticles(particles.slice(i));
+      }
       stroke(128, 128, 128);
       strokeWeight(2.5); //centerline
       setLineDash([7, 7]); //^
@@ -485,7 +490,7 @@ class paddle {
   }
 
   select_target() {
-    if (puck.x < 256) {
+    if (side == 0) {
       this.health = pong.left_health;
     } else {
       this.health = pong.right_health;
