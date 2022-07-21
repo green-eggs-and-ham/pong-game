@@ -46,6 +46,9 @@ class game {
     createCanvas(512, 256 + 32);
     this.left_health = 3;
     this.right_health = 3;
+    this.left_score = 0;
+    this.right_score = 0;
+    this.tick_reset = 255;
   }
 
   tick() {
@@ -53,9 +56,18 @@ class game {
       left_paddle.reset_coords();
       right_paddle.reset_coords();
       puck.reset_coords();
-      //display score and wait a bit
+      textSize(64);
+      noStroke();
+      fill(255, 255, 255, this.tick_reset - ticker);
+      text(pong.left_score, 128, 64);
+      text(pong.right_score, 352, 64);
+      frameRate(90);
+      pong.left_health = 3;
+      pong.right_health = 3;
       puck.serve();
-      this.game_state = "play";
+      if (ticker > this.tick_reset) {
+        this.game_state = "play";
+      }
     }
     if (this.game_state == "play") {
       left_paddle.update_coords();
@@ -79,6 +91,39 @@ class game {
       strokeWeight(2.5); //centerline
       setLineDash([7, 7]); //^
       line(256, 0 - tick_multi * 8, 256, 256 + tick_multi_2 * 8);
+      noStroke();
+      if (pong.left_health == 3) {
+        fill(239);
+      }
+      if (pong.left_health == 2) {
+        fill(112);
+      }
+      if (pong.left_health == 1) {
+        noFill();
+      }
+      if (pong.left_health < 1) {
+        noFill();
+        pong.right_score = pong.right_score + 1;
+        this.tick_reset = ticker + 255;
+        pong.game_state = "reset";
+      }
+      rect(-8, 0, 16, 256, 0, 15, 15, 0);
+      if (pong.right_health == 3) {
+        fill(239);
+      }
+      if (pong.right_health == 2) {
+        fill(112);
+      }
+      if (pong.right_health == 1) {
+        noFill();
+      }
+      if (pong.right_health < 1) {
+        noFill();
+        pong.left_score = pong.left_score + 1;
+        this.tick_reset = ticker + 255;
+        pong.game_state = "reset";
+      }
+      rect(520, 0, -16, 256, 0, 15, 15, 0);
       left_paddle.render();
       right_paddle.render();
       puck.render();
@@ -122,8 +167,8 @@ class ball {
     this.oy = 0;
     this.min_y = 10;
     this.max_y = 246;
-    this.min_x = 10;
-    this.max_x = 502;
+    this.min_x = 18;
+    this.max_x = 496;
     this.collision = false;
     this.radius = 5;
     this.rect = null;
@@ -184,10 +229,16 @@ class ball {
 
   reflect_x() {
     this.vx = this.vx * -1;
+  }
+
+  score() {
+    this.vx = this.vx * -1;
     if (this.min_x >= this.nx) {
       this.nx = this.min_x - this.nx;
+      pong.left_health = pong.left_health - 1;
     } else {
       this.nx = this.nx - this.max_x;
+      pong.right_health = pong.right_health - 1;
     }
   }
 
@@ -202,7 +253,11 @@ class ball {
 
   transfer_velocity() {
     this.ovx = this.vx;
-    this.vx = this.vx + this.rect.vx / 5 + 1;
+    if (this.x < 256) {
+      this.vx = this.vx + this.rect.vx / 5 + 1;
+    } else {
+      this.vx = this.vx + this.rect.vx / 5 - 1;
+    }
     this.vy = this.vy + this.rect.vy / 5;
     if (Math.sign(this.ovx) == Math.sign(this.vx)) {
       //play cool sound
@@ -229,7 +284,7 @@ class ball {
     ) {
       this.collision = true;
       if (Math.sign(this.vx) != Math.sign(this.rect.vx)) {
-        this.nx = this.nx * -1;
+        this.reflect_x();
       } else {
         this.transfer_velocity();
       }
@@ -240,11 +295,12 @@ class ball {
       }
     }
     if (
-      this.min_x - this.radius > this.nx ||
-      this.nx > this.max_x + this.radius
+      (this.min_x - this.radius > this.nx ||
+        this.nx > this.max_x + this.radius) &&
+      !this.collision
     ) {
       this.collision = true;
-      this.reflect_x(); //replace this with the score function
+      this.score();
     }
     if (
       this.min_y - this.radius > this.ny ||
@@ -275,7 +331,7 @@ class ball {
 }
 
 class paddle {
-  constructor(side = 0, ai = 0) {
+  constructor(side = 0, ai = 0, ai_level = 0) {
     this.x = -1;
     this.y = -1;
     this.vx = 0;
@@ -284,11 +340,16 @@ class paddle {
     this.oy = 0;
     this.nx = -1;
     this.ny = -1;
+    this.health = 3;
+    this.target_x = 0;
+    this.target_y = 0;
+    this.mode = 0;
     this.ms = 3; //const1
     this.check_x = false;
     this.check_y = false;
     this.side = side;
     this.ai = ai;
+    this.ai_level = ai_level;
     this.min_y = 16;
     this.max_y = 240;
     this.bash_tick = 0;
@@ -348,6 +409,7 @@ class paddle {
   }
 
   reset_coords() {
+    this.bash_tick = 0;
     this.y = 128;
     if (this.side) {
       this.x = 496;
@@ -384,62 +446,146 @@ class paddle {
     }
   }
 
+  up() {
+    this.ny = this.ny - this.ms;
+  }
+
+  down() {
+    this.ny = this.ny + this.ms;
+  }
+
+  left() {
+    this.nx = this.nx - this.ms;
+  }
+
+  right() {
+    this.nx = this.nx + this.ms;
+  }
+
+  bash() {
+    if (!this.bash_tick) {
+      this.mode = 0;
+      this.bash_tick = this.bash_start;
+      this.bash_length = 15;
+      this.break_cooldown = 10;
+    } else {
+      if (this.bash_tick < 345) {
+        this.bash_length = 15 - (this.bash_tick / this.bash_start) * 15;
+        this.break_cooldown = 5;
+        this.bash_tick = this.bash_start;
+      }
+    }
+  }
+
+  select_target() {
+    if (puck.x < 256) {
+      this.health = pong.left_health;
+    } else {
+      this.health = pong.right_health;
+    }
+    if (
+      !Math.floor(Math.random() * (1.5 * this.health)) ||
+      this.bash_tick > this.bash_start - this.bash_length
+    ) {
+      if (puck.x < 256) {
+        if (this.side == 0) {
+          if (this.x > puck.x) {
+            this.mode = 1;
+          } else {
+            this.mode = 0;
+          }
+          if (Math.round(Math.random()) || abs(puck.vx) < 3) {
+            this.target_x = puck.x - 7;
+          } else {
+            this.target_x = 32;
+          }
+          this.target_y = puck.y;
+        } else {
+          this.target_x = 481;
+          this.target_y = 128;
+        }
+      } else {
+        if (this.side == 1) {
+          if (this.x < puck.x) {
+            this.mode = 1;
+          } else {
+            this.mode = 0;
+          }
+          if (Math.round(Math.random()) || abs(puck.vx) < 3) {
+            this.target_x = puck.x + 7;
+          } else {
+            this.target_x = 480;
+          }
+          this.target_y = puck.y;
+        } else {
+          this.target_x = 33;
+          this.target_y = 128;
+        }
+      }
+    }
+  }
+
   update_coords() {
     this.ox = this.x;
     this.oy = this.y;
+    this.nx = 0;
+    this.ny = 0;
+    this.tick();
     if (this.ai) {
-      this.reset_coords(); //another temporary bit of code
+      this.select_target();
+      if (this.x > this.target_x) {
+        this.left();
+      }
+      if (this.x < this.target_x) {
+        this.right();
+      }
+      if (this.y > this.target_y) {
+        this.up();
+      }
+      if (this.y < this.target_y) {
+        this.down();
+      }
+      if (this.mode == 1) {
+        this.bash();
+      }
     } else {
-      this.nx = 0;
-      this.ny = 0;
-      this.tick();
       if (keyIsDown(87)) {
         //w
-        this.ny = this.ny - this.ms;
+        this.up();
       }
       if (keyIsDown(83)) {
         //s
-        this.ny = this.ny + this.ms;
+        this.down();
       }
       if (keyIsDown(65)) {
         //a
-        this.nx = this.nx - this.ms;
+        this.left();
       }
       if (keyIsDown(68)) {
         //d
-        this.nx = this.nx + this.ms;
+        this.right();
       }
       if (keyIsDown(32)) {
         //space
-        if (!this.bash_tick) {
-          this.bash_tick = this.bash_start;
-          this.bash_length = 15;
-          this.break_cooldown = 10;
-        } else {
-          if (this.bash_tick < 345) {
-            this.bash_length = 15 - (this.bash_tick / this.bash_start) * 15;
-            this.break_cooldown = 5;
-            this.bash_tick = this.bash_start;
-          }
-        }
+        this.bash();
       }
-      if (this.bash_tick > this.bash_start - this.bash_length) {
-        //tick duration from 360
-        this.ms_tick = this.ms_tick + 6;
-        this.ms = 3 + abs(sin(this.ms_tick) * 10); //ms increaser
-      } else {
-        this.ms = 3; //const2
-        this.ms_tick = 0;
-      }
-      this.check_coords();
-      if (this.check_x) {
-        this.x = this.x + this.nx;
-      }
-      if (this.check_y) {
-        this.y = this.y + this.ny;
-      }
-      this.calculate_velocity();
     }
+    if (this.bash_tick > this.bash_start - this.bash_length) {
+      //tick duration from 360
+      this.ms_tick = this.ms_tick + 6;
+      this.ms = 3 + abs(sin(this.ms_tick) * 10); //ms increaser
+    } else {
+      this.ms = 3; //const2
+      this.ms_tick = 0;
+    }
+    this.check_coords();
+    if (this.check_x) {
+      this.x = this.x + this.nx;
+    }
+    if (this.check_y) {
+      this.y = this.y + this.ny;
+    }
+    this.calculate_velocity();
   }
 }
 
@@ -452,8 +598,8 @@ function setup() {
   tick_multi = ticker;
   tick_multi_2 = ticker;
   particles = [];
-  left_paddle = new paddle();
-  right_paddle = new paddle((side = 1), (ai = 0));
+  left_paddle = new paddle((side = 0), (ai = 0));
+  right_paddle = new paddle((side = 1), (ai = 1));
   puck = new ball();
   for (let i = 0; i < width / 3; i++) {
     particles.push(new particle());
