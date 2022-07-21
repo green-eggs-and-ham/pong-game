@@ -135,6 +135,13 @@ class game {
       rect(512, 256, -250, 9, 0, 5, 5, 0);
       fill(96);
       rect(0, 265, 512, 25);
+      fill(255);
+      textSize(16);
+      text("Full Screen", 216, 282);
+      stroke(64);
+      strokeWeight(3);
+      line(212, 265, 212, 295);
+      line(300, 265, 300, 295);
       left_paddle.render_bash();
       right_paddle.render_bash();
     }
@@ -616,10 +623,22 @@ function draw() {
 
 function mousePressed() {
   fs = fullscreen();
-  fullscreen(!fs);
-  if (!fs) {
-    document.body.style.zoom = windowWidth / width; //this.blur();
+  if (fs) {
+    multi = windowWidth / width;
   } else {
-    document.body.style.zoom = 1.0;
+    multi = 1;
+  }
+  if (
+    mouseX > 212 * multi &&
+    mouseX < 300 * multi &&
+    mouseY > 265 * multi &&
+    mouseY < 295 * multi
+  ) {
+    fullscreen(!fs);
+    if (!fs) {
+      document.body.style.zoom = windowWidth / width; //this.blur();
+    } else {
+      document.body.style.zoom = 1.0;
+    }
   }
 }
