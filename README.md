@@ -1,5 +1,6 @@
 # PongGame
 
+
 [[Site](http://pongg.gq)]
 [[Site](http://pongg.ga)]
 [[Site](http://pongg.tk)]
@@ -7,7 +8,20 @@
 
 Find the web hosted version game at the links above & maybe some supprises.
 
-## Installing
+## Installing 1
+
+In order to run the pong game, ensure that you have VSCode's / VSCodium's LiveServer extention.
+
+Navigate and open the directory where you downloaded the files in the editor.
+
+# Running 1
+
+Click **Go Live**  (Should be bottom left by default)
+
+Or see *installing 2* (below)
+
+
+## Installing 2
 
 In order to run the pong game, ensure that you have [Git](https://git-scm.com/downloads) & [Python](https://www.python.org/downloads)
 
@@ -27,7 +41,7 @@ cd pong-game
 
 ```
 
-## Usage
+## Running 2
 
 ```bash
 
