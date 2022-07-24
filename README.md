@@ -6,7 +6,12 @@
 [[Site](http://pongg.tk)]
 [[Site](http://pongg.gq)]
 
-Find the web hosted version game at the links above & maybe some supprises.
+Find the online version game at the links above & maybe some supprises.
+
+## Screenshots
+
+<img src="/images/pong-start.jpeg" alt="Cover" width="500"/> <img src="/images/pong-playing.jpeg" alt="Playing" width="500"/>
+
 
 ## Installing 1
 
