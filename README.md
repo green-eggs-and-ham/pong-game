@@ -10,7 +10,7 @@ Find the web hosted version game at the links above & maybe some supprises.
 
 ## Installing 1
 
-In order to run the pong game, ensure that you have VSCode's / VSCodium's LiveServer extention.
+In order to run the pong game, it is recomended that you have VSCode's / VSCodium's LiveServer extention, however running `html/index.html` is also possible.
 
 Navigate and open the directory where you downloaded the files in the editor.
 
