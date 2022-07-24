@@ -1,9 +1,9 @@
 # PongGame
 
-[![Site](http://pongg.gq)]
-[![Site](http://pongg.ga)]
-[![Site](http://pongg.tk)]
-[![Site](http://pongg.gq)]
+[[Site](http://pongg.gq)]
+[[Site](http://pongg.ga)]
+[[Site](http://pongg.tk)]
+[[Site](http://pongg.gq)]
 
 Find the web hosted version game at the links above & maybe some supprises.
 
