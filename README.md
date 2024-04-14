@@ -1,6 +1,6 @@
 # PongGame
 
-
+*Note that these sites may no longer be up anymore*
 [[Site](http://pongg.gq)]
 [[Site](http://pongg.ga)]
 [[Site](http://pongg.tk)]
