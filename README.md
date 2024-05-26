@@ -1,6 +1,6 @@
-# PongGame
+# Pong Game
 
-*Note that these links may be dead:*
+*Note that these links are dead due to the domain registrar dying:*
 
 [[Site](http://pongg.gq)]
 [[Site](http://pongg.ga)]
